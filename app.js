@@ -485,7 +485,12 @@
     paintMarkers();
     var btn = el('#addCase');
     if (btn) { btn.disabled = true; btn.textContent = '오늘 목록에 있음'; }
-    toast('접수 1건을 오늘 목록 맨 위에 올렸습니다.');
+    toast('접수 1건을 오늘 목록 맨 위에 올렸습니다. 자녀 앱에 접수 알림을 보냈습니다.');
+    var note = el('.notes .nt');
+    if (note) {
+      note.classList.add('ping');
+      setTimeout(function () { note.classList.remove('ping'); }, 1900);
+    }
     if (map) {
       map.panInside([cx(item.cx).lat, cx(item.cx).lon], { padding: [46, 46], animate: true, duration: 0.45 });
     }
