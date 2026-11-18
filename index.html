@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>한통돌봄 · 부산 에코델타시티 돌봄 접수 시연</title>
+<meta name="description" content="어르신이 단축번호로 거는 전화 한 통이 생활지원사의 오늘 방문 순서가 되는 돌봄 접수 시연 화면입니다.">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6.5 3.5h3l1.4 3.6-2 1.3a11 11 0 0 0 5.7 5.7l1.3-2 3.6 1.4v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2Z"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <b>한통돌봄</b>
+        <i>부산 에코델타시티 돌봄 접수 · 우선방문</i>
+      </span>
+    </div>
+    <div class="top-right">
+      <span class="demo"><span class="dot" aria-hidden="true"></span>DEMO · 기획 시연용</span>
+      <span class="who">11월 18일 수요일 · 생활지원사 A</span>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="화면 선택">
+    <button type="button" role="tab" id="tab-today" aria-controls="p-today" aria-selected="true" data-tab="today">오늘의 방문</button>
+    <button type="button" role="tab" id="tab-call" aria-controls="p-call" aria-selected="false" tabindex="-1" data-tab="call">전화 접수</button>
+    <button type="button" role="tab" id="tab-link" aria-controls="p-link" aria-selected="false" tabindex="-1" data-tab="link">연계 · 근거</button>
+  </nav>
+
+  <main>
+    <!-- 오늘의 방문 -->
+    <section class="panel" id="p-today" role="tabpanel" aria-labelledby="tab-today">
+      <div class="kpis" id="kpis"></div>
+
+      <div class="today-grid">
+        <div class="list-col">
+          <div class="sec-head">
+            <h2>우선방문</h2>
+            <p>긴급도와 같은 단지 묶음으로 정렬했습니다</p>
+          </div>
+          <ul class="cases" id="caseList"></ul>
+          <p class="foot-note">접수 내용은 시연 시나리오 값입니다. 가구 정보는 동·호수까지만 표시합니다.</p>
+        </div>
+
+        <div class="map-col">
+          <div class="map-card">
+            <div class="map-head">
+              <span class="map-title">에코델타시티 단지 지도</span>
+              <span class="legend" aria-hidden="true">
+                <i class="lg red"></i>적색
+                <i class="lg amber"></i>황색
+                <i class="lg green"></i>일반
+              </span>
+            </div>
+            <div class="map-box"><div id="map" aria-label="접수 위치 지도"></div></div>
+            <div class="map-foot" id="mapFoot"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 전화 접수 -->
+    <section class="panel" id="p-call" role="tabpanel" aria-labelledby="tab-call" hidden>
+      <div class="call-intro">
+        <div class="sec-head">
+          <h2>어르신이 거는 전화</h2>
+          <p>앱 설치도 회원가입도 없이 단축번호 한 번입니다. 상황을 골라 통화를 재생해 보세요.</p>
+        </div>
+      </div>
+
+      <div class="scenario-group" role="group" aria-label="통화 상황 선택">
+        <button type="button" class="sc" data-sc="health" aria-pressed="false">
+          <span class="sc-1">건강 이상</span>
+          <span class="sc-2">어지럽고 약을 못 먹었어예</span>
+        </button>
+        <button type="button" class="sc" data-sc="home" aria-pressed="false">
+          <span class="sc-1">보일러 · 생활민원</span>
+          <span class="sc-2">보일러가 안 된다예</span>
+        </button>
+        <button type="button" class="sc" data-sc="ride" aria-pressed="false">
+          <span class="sc-1">약 · 병원 동행</span>
+          <span class="sc-2">내일 병원에 혼자 못 가겠어예</span>
+        </button>
+      </div>
+
+      <div class="call-grid">
+        <div class="call-left">
+          <div class="phone" id="phone">
+            <div class="phone-head">
+              <span class="pill">단축번호 1번</span>
+              <span class="timer" id="callTimer">00:00</span>
+            </div>
+            <div class="caller">
+              <span class="caller-ava" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6.5 3.5h3l1.4 3.6-2 1.3a11 11 0 0 0 5.7 5.7l1.3-2 3.6 1.4v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2Z"/>
+                </svg>
+              </span>
+              <span class="caller-name">한통돌봄 접수</span>
+              <span class="caller-state" id="callState">거는 중</span>
+            </div>
+            <ol class="transcript" id="transcript" aria-live="polite"></ol>
+            <div class="phone-foot">
+              <button type="button" class="ghost" id="replay" disabled>다시 듣기</button>
+              <button type="button" class="hangup" id="hangup" disabled>통화 종료</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ticket-col">
+          <div class="sec-head">
+            <h2>접수 티켓</h2>
+            <p>통화가 끝나면 AI가 구조화한 결과가 여기에 뜹니다</p>
+          </div>
+          <div class="ticket empty" id="ticket">
+            <p class="empty-text">왼쪽에서 상황을 고르면 통화가 시작됩니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="relay">
+        <div class="sec-head">
+          <h2>접수는 자녀에게 바로 전해집니다</h2>
+          <p>어르신 폰에는 첫 방문 때 바로가기 하나만 두고, 접수와 배정, 방문 완료는 멀리 사는 자녀 앱 알림으로 갑니다.</p>
+        </div>
+
+        <div class="relay-grid">
+          <div class="card relay-card">
+            <div class="rc-head">
+              <h3>어르신 폰 홈 화면</h3>
+              <span class="tag sim">예시</span>
+            </div>
+            <div class="phone-stage">
+              <div class="elder-phone" aria-label="어르신 폰 홈 화면 예시: 도움 전화 위젯">
+                <div class="hp-bar"><span>07:48</span><span class="hp-sig" aria-hidden="true"><i></i><i></i><i></i></span></div>
+                <div class="hp-date">11월 18일 수요일</div>
+                <div class="hp-widget">
+                  <span class="hp-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6.5 3.5h3l1.4 3.6-2 1.3a11 11 0 0 0 5.7 5.7l1.3-2 3.6 1.4v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2Z"/>
+                    </svg>
+                  </span>
+                  <span class="hp-txt"><b>도움 전화</b><i>1번을 길게 누르세요</i></span>
+                </div>
+                <div class="hp-apps" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                <div class="hp-dock" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+              </div>
+            </div>
+            <p class="card-note">첫 방문 때 홈 화면에 이 위젯 하나와 단축번호 1번을 함께 설정합니다. 어르신이 새로 배우는 것은 이것뿐입니다.</p>
+          </div>
+
+          <div class="card relay-card">
+            <div class="rc-head">
+              <h3>자녀 보호자 앱 알림</h3>
+              <span class="tag live">실시간 예시</span>
+            </div>
+            <div class="guardian-app">
+              <div class="ga-head">
+                <span class="ga-ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20s-7-4.3-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.7-7 9-7 9Z"/>
+                  </svg>
+                </span>
+                <span class="ga-t"><b>한통돌봄 보호자</b><i>어머니 댁 · 수자인 105동</i></span>
+              </div>
+              <ol class="notes">
+                <li class="nt red">
+                  <span class="nt-t"><b>접수</b><em>07:52</em></span>
+                  <span class="nt-b">어머니 댁에서 전화가 왔습니다</span>
+                  <span class="nt-m">건강 이상 · 적색 · 어지럼 이틀, 식사 이틀 못 함</span>
+                </li>
+                <li class="nt amber">
+                  <span class="nt-t"><b>배정</b><em>07:53</em></span>
+                  <span class="nt-b">생활지원사 A가 방문합니다</span>
+                  <span class="nt-m">30분 안에 도착 예정</span>
+                </li>
+                <li class="nt green">
+                  <span class="nt-t"><b>방문 완료</b><em>08:24</em></span>
+                  <span class="nt-b">방문을 마쳤습니다</span>
+                  <span class="nt-m">혈압 168/96 · 보건소 상담 후 119 이송</span>
+                </li>
+              </ol>
+            </div>
+            <p class="card-note">접수, 배정, 완료가 같은 흐름으로 도착합니다. 자녀가 따로 전화해 확인하지 않아도 상황을 압니다.</p>
+          </div>
+        </div>
+
+        <p class="foot-note">알림 문구와 시간은 시연 시나리오 값입니다. 실제 서비스에서는 보호자가 앱에서 알림 항목을 직접 고릅니다.</p>
+      </div>
+    </section>
+
+    <!-- 연계 · 근거 -->
+    <section class="panel" id="p-link" role="tabpanel" aria-labelledby="tab-link" hidden>
+      <div class="sec-head wide">
+        <h2>접수 한 건이 오늘의 방문이 되기까지</h2>
+        <p>에코델타시티가 이미 갖고 있는 관제·돌봄 기록 위에 전화 접수 한 축을 얹습니다.</p>
+      </div>
+
+      <ol class="flow">
+        <li>
+          <span class="fl-1">1</span>
+          <b>전화 한 통</b>
+          <p>첫 방문 때 홈 화면에 둔 바로가기 하나를 누릅니다. 어르신 쪽 앱 설치와 회원가입이 없습니다.</p>
+        </li>
+        <li>
+          <span class="fl-1">2</span>
+          <b>받아 적기</b>
+          <p>사투리와 짧은 일상어를 알아듣고 증상, 시점, 집 안 상태, 필요한 도움을 나눠 적습니다.</p>
+        </li>
+        <li>
+          <span class="fl-1">3</span>
+          <b>긴급도와 위치</b>
+          <p>말의 내용, 최근 접수 이력, 단지 위치, 보유 질환을 함께 보고 순서를 정합니다.</p>
+        </li>
+        <li>
+          <span class="fl-1">4</span>
+          <b>오늘의 방문과 알림</b>
+          <p>생활지원사와 행정복지센터 대시보드에 우선순위로 올라가고, 배정과 완료는 자녀 앱 알림으로도 갑니다.</p>
+        </li>
+        <li>
+          <span class="fl-1">5</span>
+          <b>다음 판단</b>
+          <p>처리 결과가 남아 다음 접수의 긴급도와 반복 접수 판단에 쓰입니다.</p>
+        </li>
+      </ol>
+
+      <div class="link-grid">
+        <div class="card">
+          <h3>이어 붙이는 기록</h3>
+          <ul class="chips">
+            <li>스마트빌리지 통합관제</li>
+            <li>응급안전안심서비스 대상자 정보</li>
+            <li>노인맞춤돌봄서비스 수행기관</li>
+            <li>행정복지센터 복지 상담</li>
+            <li>119 · 병원 이송 기록</li>
+            <li>부산시 구군 독거노인 현황</li>
+          </ul>
+          <p class="card-note">새 시스템을 세우지 않고, 이미 쌓인 기록에 접수 결과를 더하는 구조입니다.</p>
+          <p class="card-note">어르신이 새로 배우는 것은 단축번호 하나입니다.</p>
+        </div>
+
+        <div class="card">
+          <h3>실측과 시연 값</h3>
+          <table class="facts">
+            <tbody>
+              <tr><th>부산 65세 이상</th><td>83만1,000명 · 25.9%</td><td><span class="tag real">공개 자료</span></td></tr>
+              <tr><th>응급관리요원 1인당</th><td>362.8가구</td><td><span class="tag real">공개 자료</span></td></tr>
+              <tr><th>응급 대응 중 활동 미감지</th><td>91.4%</td><td><span class="tag real">공개 자료</span></td></tr>
+              <tr><th>통화에서 티켓까지</th><td>10초 이내</td><td><span class="tag sim">시연 값</span></td></tr>
+              <tr><th>오늘 오전 동선 5곳</th><td>6.2km · 13분</td><td><span class="tag real">지도 계산</span></td></tr>
+              <tr><th>긴급도 판정 정확도</th><td>검증 전</td><td><span class="tag sim">시연 값</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>기대하는 변화</h3>
+          <div class="gains">
+            <div><b>먼저 말할 수 있는 창구</b><p>센서가 잡기 전에 어르신이 직접 말합니다. 응급 대응 91.4%가 사후 확인인 구조를 앞당깁니다.</p></div>
+            <div><b>방문 순서의 근거</b><p>생활지원사가 하루를 시작할 때 무엇부터 갈지 스스로 정하지 않아도 됩니다.</p></div>
+            <div><b>기록이 남는 돌봄</b><p>통화와 조치가 한 티켓에 남아 인수인계와 반복 접수 판단에 쓰입니다.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="foot-note wide">
+        이 화면은 기획을 설명하기 위한 시연입니다. 통화 내용, 접수 건, 긴급도, 방문 결과는 시나리오 값이며 실제 음성 인식 성능을 검증한 결과가 아닙니다.
+        단지 위치는 공개 지도(OpenStreetMap)의 실제 좌표이고, 동선 거리는 도로 경로로 계산했습니다. 통화 내용은 접수에 필요한 항목만 남기고 원본 음성은 정해진 기간 뒤 지우는 것을 전제로 합니다.
+      </p>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script src="data/bundle.js"></script>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
